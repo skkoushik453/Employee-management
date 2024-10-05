@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Clock, DollarSign, Target, ChevronDown, MessageCircle } from 'lucide-react';
+import { Users, Clock, DollarSign, Target, ChevronDown, MessageCircle, CheckSquare } from 'lucide-react';
 
 const Sidebar = ({ activeItem, setActiveItem }) => {
   const [openItems, setOpenItems] = useState([]);
@@ -18,7 +18,12 @@ const Sidebar = ({ activeItem, setActiveItem }) => {
       text: 'Payroll',
       subItems: ['Salary Adjustment', 'Annual Salary Statement'],
     },
-    { icon: <Target size={20} />, text: 'Goals' },
+    {
+      icon: <Target size={20} />,
+      text: 'Goals',
+      subItems: ['Task Management'],
+    },
+    { icon: <CheckSquare size={20} />, text: 'Tasks', subItems: ['Assign Task'] }, // New Tasks section
   ];
 
   const handleItemClick = (mainItem) => {

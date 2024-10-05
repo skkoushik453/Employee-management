@@ -1,4 +1,3 @@
-// src/EmployeeManagement.js
 import React, { useState } from 'react';
 import Sidebar from './Sidebar';
 import EmployeeForm from './EmployeeForm';
@@ -7,22 +6,50 @@ import Header from './Header';
 import EmployeeTable from './EmployeeTable';
 import Attendance from './Attendance';
 import LeaveForm from './LeaveForm';
-import Calendar from './calendar'; // Import the Calendar component
-import Payroll from './Payroll'; // Import the Payroll component
-import SalaryAdjustment from './SalaryAdjustment'; // Import Salary Adjustment component
-import AnnualSalaryStatement from './AnnualSalaryStatement'; // Import Annual Salary Statement component
+import Calendar from './calendar';
+import Payroll from './Payroll';
+import SalaryAdjustment from './SalaryAdjustment';
+import AnnualSalaryStatement from './AnnualSalaryStatement';
+import TaskAssignForm from './TaskAssignForm';
+import Goals from './Goals';
 
 const EmployeeManagement = () => {
   const [activeItem, setActiveItem] = useState('Employee');
   const [activeView, setActiveView] = useState('Manage Employee');
   const [isAddingEmployee, setIsAddingEmployee] = useState(false);
   const [isAddingLeave, setIsAddingLeave] = useState(false);
-  const [isGeneratingPayroll, setIsGeneratingPayroll] = useState(false); // New state for payroll
+  const [isGeneratingPayroll, setIsGeneratingPayroll] = useState(false);
   const [employees, setEmployees] = useState([
-    { name: 'Ryan Harris', image: '/api/placeholder/32/32', position: 'Finance Manager', department: 'Finance', checkInTime: null, checkOutTime: null },
-    { name: 'Michael King', image: '/api/placeholder/32/32', position: 'HR Manager', department: 'HR', checkInTime: null, checkOutTime: null },
-    { name: 'Deborah Brown', image: '/api/placeholder/32/32', position: 'IT Helpdesk', department: 'IT', checkInTime: null, checkOutTime: null },
+    {
+      id: 1,
+      name: 'Ryan Harris',
+      image: '/api/placeholder/32/32',
+      position: 'Finance Manager',
+      department: 'Finance',
+      checkInTime: null,
+      checkOutTime: null,
+    },
+    {
+      id: 2,
+      name: 'Michael King',
+      image: '/api/placeholder/32/32',
+      position: 'HR Manager',
+      department: 'HR',
+      checkInTime: null,
+      checkOutTime: null,
+    },
+    {
+      id: 3,
+      name: 'Deborah Brown',
+      image: '/api/placeholder/32/32',
+      position: 'IT Helpdesk',
+      department: 'IT',
+      checkInTime: null,
+      checkOutTime: null,
+    },
   ]);
+  const [tasks, setTasks] = useState([]);
+  const [goals, setGoals] = useState([]);
 
   const [newEmployee, setNewEmployee] = useState({
     name: '',
@@ -39,7 +66,10 @@ const EmployeeManagement = () => {
 
   const handleAddEmployee = (e) => {
     e.preventDefault();
-    setEmployees((prev) => [...prev, { ...newEmployee, id: Date.now(), checkInTime: null, checkOutTime: null }]);
+    setEmployees((prev) => [
+      ...prev,
+      { ...newEmployee, id: Date.now(), checkInTime: null, checkOutTime: null },
+    ]);
     setNewEmployee({ name: '', position: '', department: '', email: '', phone: '' });
     setIsAddingEmployee(false);
   };
@@ -65,13 +95,20 @@ const EmployeeManagement = () => {
   };
 
   const handleAddLeave = (leaveRequest) => {
-    console.log("Leave Request Submitted: ", leaveRequest);
+    console.log('Leave Request Submitted: ', leaveRequest);
   };
 
   const handleGenerateReceipt = (payrollData) => {
-    console.log("Payroll Receipt Generated: ", payrollData);
-    // You can implement logic here to handle the generated payroll receipt
-    setIsGeneratingPayroll(false); // Close the Payroll component after generating the receipt
+    console.log('Payroll Receipt Generated: ', payrollData);
+    setIsGeneratingPayroll(false);
+  };
+
+  const handleTaskAssignment = (taskDetails) => {
+    setTasks((prevTasks) => [...prevTasks, { ...taskDetails, id: Date.now() }]);
+  };
+
+  const handleSetGoals = (goalDetails) => {
+    setGoals((prevGoals) => [...prevGoals, { ...goalDetails, id: Date.now() }]);
   };
 
   const renderContent = () => {
@@ -96,16 +133,17 @@ const EmployeeManagement = () => {
     }
 
     if (isGeneratingPayroll) {
-      return (
-        <Payroll handleGenerateReceipt={handleGenerateReceipt} /> // Render Payroll component
-      );
+      return <Payroll handleGenerateReceipt={handleGenerateReceipt} />;
     }
 
     switch (activeView) {
       case 'Manage Employee':
         return (
           <>
-            <EmployeeDashboard employees={employees} setIsAddingEmployee={setIsAddingEmployee} />
+            <EmployeeDashboard
+              employees={employees}
+              setIsAddingEmployee={setIsAddingEmployee}
+            />
             <EmployeeTable employees={employees} />
           </>
         );
@@ -117,21 +155,38 @@ const EmployeeManagement = () => {
             handleCheckOut={handleCheckOut}
           />
         );
-      case 'Leave':
+      case 'Leave Form':
         return (
           <LeaveForm
             setIsAddingLeave={setIsAddingLeave}
             handleAddLeave={handleAddLeave}
           />
         );
-      case 'Calendar': // Render the Calendar when the Calendar item is active
+      case 'Calendar':
         return <Calendar />;
-      case 'Payroll': // Render the Payroll when the Payroll item is active
+      case 'Payroll':
         return <Payroll handleGenerateReceipt={handleGenerateReceipt} />;
-      case 'Salary Adjustment': // Render the Salary Adjustment when the item is active
+      case 'Salary Adjustment':
         return <SalaryAdjustment />;
-      case 'Annual Salary Statement': // Render the Annual Salary Statement when the item is active
+      case 'Annual Salary Statement':
         return <AnnualSalaryStatement />;
+      case 'Assign Task':
+        return (
+          <TaskAssignForm
+            employees={employees}
+            handleTaskAssignment={handleTaskAssignment}
+            tasks={tasks}
+          />
+        );
+      case 'Set Goals':
+      case 'View Goals':
+        return (
+          <Goals
+            employees={employees}
+            handleSetGoals={handleSetGoals}
+            goals={goals}
+          />
+        );
       default:
         return <h2 className="text-2xl font-semibold">{activeView}</h2>;
     }
@@ -145,8 +200,10 @@ const EmployeeManagement = () => {
           setActiveItem(item);
           setActiveView(item === 'Employee' ? 'Manage Employee' : item);
           setIsAddingEmployee(false);
-          setIsAddingLeave(item === 'Leave' ? false : item === 'Leave Form' ? true : false);
-          setIsGeneratingPayroll(item === 'Payroll'); // Activate payroll component
+          setIsAddingLeave(
+            item === 'Leave' ? false : item === 'Leave Form' ? true : false
+          );
+          setIsGeneratingPayroll(item === 'Payroll');
         }}
       />
       <div className="flex-1 ml-64 p-8">

@@ -9,8 +9,7 @@ const LoginPage = () => {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    // Add authentication logic here (e.g., API call to verify user)
-    // For demonstration, we'll assume successful login and redirect
+
 
     if (userType === 'admin') {
       history.push('/admin'); // Redirect to admin panel

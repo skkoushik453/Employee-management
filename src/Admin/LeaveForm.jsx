@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-const LeaveForm = ({ setIsAddingLeave, handleAddLeave }) => {
+const LeaveForm = ({ handleAddLeave, setIsAddingLeave }) => {
   const [leaveRequest, setLeaveRequest] = useState({
     name: '',
-    description: '',
+    email: '',
     reason: '',
-    duration: '',
     fromDate: '',
     toDate: '',
   });
 
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -21,23 +21,30 @@ const LeaveForm = ({ setIsAddingLeave, handleAddLeave }) => {
     e.preventDefault();
     const { fromDate, toDate } = leaveRequest;
 
-    // Validation: Check if the 'to' date is after the 'from' date
+    // Validation: Check if 'to' date is after 'from' date
     if (new Date(fromDate) >= new Date(toDate)) {
       setError("The 'To Date' must be after the 'From Date'.");
       return;
     }
 
-    // Clear error and submit the leave request
+    // Clear error and show success popup
     setError('');
+    setSuccessMessage('Leave request submitted successfully!');
     handleAddLeave(leaveRequest);
+
+    // Reset the form
     setLeaveRequest({
       name: '',
-      description: '',
+      email: '',
       reason: '',
-      duration: '',
       fromDate: '',
       toDate: '',
     });
+
+    // Clear success message after a few seconds
+    setTimeout(() => setSuccessMessage(''), 3000);
+
+    // Close form (optional, depends on your use case)
     setIsAddingLeave(false);
   };
 
@@ -45,38 +52,30 @@ const LeaveForm = ({ setIsAddingLeave, handleAddLeave }) => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <h2 className="text-2xl font-semibold">Leave Request Form</h2>
       {error && <p className="text-red-500">{error}</p>}
+      {successMessage && <p className="text-green-500">{successMessage}</p>}
       <input
         type="text"
         name="name"
         value={leaveRequest.name}
         onChange={handleInputChange}
-        placeholder="Employee Name"
+        placeholder="Name"
+        required
+        className="border p-2 rounded w-full"
+      />
+      <input
+        type="email"
+        name="email"
+        value={leaveRequest.email}
+        onChange={handleInputChange}
+        placeholder="Email"
         required
         className="border p-2 rounded w-full"
       />
       <textarea
-        name="description"
-        value={leaveRequest.description}
-        onChange={handleInputChange}
-        placeholder="Leave Description"
-        required
-        className="border p-2 rounded w-full"
-      />
-      <input
-        type="text"
         name="reason"
         value={leaveRequest.reason}
         onChange={handleInputChange}
-        placeholder="Reason for Leave"
-        required
-        className="border p-2 rounded w-full"
-      />
-      <input
-        type="text"
-        name="duration"
-        value={leaveRequest.duration}
-        onChange={handleInputChange}
-        placeholder="Duration (e.g., 2 days)"
+        placeholder="Reason"
         required
         className="border p-2 rounded w-full"
       />
@@ -102,7 +101,10 @@ const LeaveForm = ({ setIsAddingLeave, handleAddLeave }) => {
           className="border p-2 rounded w-full"
         />
       </label>
-      <button type="submit" className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+      <button
+        type="submit"
+        className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+      >
         Submit Leave Request
       </button>
     </form>
